@@ -24,6 +24,11 @@
 
 Creado por [_**Ignacio Fianza**_](https://ignaciofianza.com), desarrollado de forma independiente como proyecto personal.
 
+## Licencia
+
+Este proyecto está licenciado bajo [Creative Commons BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).  
+Podés consultar el archivo `LICENSE` para más detalles.
+
 ---
 
 > ⚠️ Este proyecto es de código abierto, pero el backend no está incluido ya que está diseñado para uso personal y no está pensado para ser replicado o consumido públicamente.
