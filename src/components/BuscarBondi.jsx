@@ -1,5 +1,17 @@
+// src/components/BuscarBondi.jsx
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+
+// Fix del icono de Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
 
 const BuscarBondi = () => {
   const [parada, setParada] = useState("");
@@ -40,6 +52,27 @@ const BuscarBondi = () => {
     </div>
   );
 
+  const renderMapa = (coords) => {
+    if (!coords || coords.length !== 2) return null;
+    const [lng, lat] = coords;
+    return (
+      <MapContainer
+        center={[lat, lng]}
+        zoom={15}
+        scrollWheelZoom={false}
+        className="h-48 w-full rounded overflow-hidden border mt-2"
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution="&copy; OpenStreetMap"
+        />
+        <Marker position={[lat, lng]}>
+          <Popup>Última ubicación del bus</Popup>
+        </Marker>
+      </MapContainer>
+    );
+  };
+
   return (
     <section id="buscar-bondi" className="mt-12 px-4 max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold mb-4 text-center">
@@ -55,9 +88,7 @@ const BuscarBondi = () => {
           placeholder="Número de parada (ej: 1615)"
           value={parada}
           onChange={(e) => setParada(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") buscar();
-          }}
+          onKeyDown={(e) => e.key === "Enter" && buscar()}
           className="flex-1 px-4 py-2 text-center border rounded-xl focus:outline-none focus:ring"
         />
         <button
@@ -99,7 +130,7 @@ const BuscarBondi = () => {
                   transition: { staggerChildren: 0.1 },
                 },
               }}
-              className="space-y-3"
+              className="space-y-4"
             >
               {resultado.map((item, index) => (
                 <motion.div
@@ -132,15 +163,19 @@ const BuscarBondi = () => {
                         {item.eta} seg)
                       </div>
                     )}
+
                     {item.access &&
                       item.access.toLowerCase() !== "sin datos" &&
-                      tag(<span>👨‍🦽‍➡️</span>, item.access)}
+                      tag("👨‍🦽", item.access)}
                     {item.thermalConfort &&
                       item.thermalConfort.toLowerCase() !== "sin datos" &&
-                      tag(<span>❄️</span>, item.thermalConfort)}
+                      tag("❄️", item.thermalConfort)}
                     {item.emissions &&
                       item.emissions.toLowerCase() !== "sin datos" &&
-                      tag(<span>🍃</span>, item.emissions)}
+                      tag("🍃", item.emissions)}
+
+                    {item.location?.coordinates &&
+                      renderMapa(item.location.coordinates)}
                   </div>
                 </motion.div>
               ))}

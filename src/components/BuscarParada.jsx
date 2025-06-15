@@ -8,7 +8,8 @@ import L from "leaflet";
 // Fix del icono de Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
@@ -33,7 +34,11 @@ const BuscarParada = () => {
       setLoading(true);
       try {
         const cache = localStorage.getItem("paradasCache");
-        const data = cache ? JSON.parse(cache) : await (await fetch("https://infobondiapi.ignaciofianza.com/api/paradas")).json();
+        const data = cache
+          ? JSON.parse(cache)
+          : await (
+              await fetch("https://infobondiapi.ignaciofianza.com/api/paradas")
+            ).json();
         if (!cache) localStorage.setItem("paradasCache", JSON.stringify(data));
         setParadas(data);
       } catch (err) {
@@ -49,7 +54,10 @@ const BuscarParada = () => {
   const [input, setInput] = useState("");
   useEffect(() => {
     clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setBusqueda(input.trim().toLowerCase()), 300);
+    timeoutRef.current = setTimeout(
+      () => setBusqueda(input.trim().toLowerCase()),
+      300
+    );
     return () => clearTimeout(timeoutRef.current);
   }, [input]);
 
@@ -58,28 +66,31 @@ const BuscarParada = () => {
     if (!paradas.length) return [];
 
     if (!busqueda) {
-      const favs = paradas.filter(p => favoritas.includes(p.busstopId));
-      const otras = paradas.filter(p => !favoritas.includes(p.busstopId));
-      const extra = otras.sort(() => 0.5 - Math.random()).slice(0, favs.length > 10 ? 3 : 10 - favs.length);
+      const favs = paradas.filter((p) => favoritas.includes(p.busstopId));
+      const otras = paradas.filter((p) => !favoritas.includes(p.busstopId));
+      const extra = otras
+        .sort(() => 0.5 - Math.random())
+        .slice(0, favs.length > 10 ? 3 : 10 - favs.length);
       return [...favs, ...extra];
     }
 
-    return paradas.filter(p =>
-      p.street1?.toLowerCase().includes(busqueda) ||
-      p.street2?.toLowerCase().includes(busqueda)
+    return paradas.filter(
+      (p) =>
+        p.street1?.toLowerCase().includes(busqueda) ||
+        p.street2?.toLowerCase().includes(busqueda)
     );
   }, [paradas, favoritas, busqueda]);
 
   const toggleFavorita = (id) => {
     const nuevas = favoritas.includes(id)
-      ? favoritas.filter(f => f !== id)
+      ? favoritas.filter((f) => f !== id)
       : [...favoritas, id];
     setFavoritas(nuevas);
     localStorage.setItem("paradasFavoritas", JSON.stringify(nuevas));
   };
 
   const toggleExpand = (id) => {
-    setExpandedId(prev => (prev === id ? null : id));
+    setExpandedId((prev) => (prev === id ? null : id));
   };
 
   const renderMapa = (coords) => {
@@ -105,7 +116,9 @@ const BuscarParada = () => {
 
   return (
     <section className="mt-12 px-4 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-center">📍 ¿No sabés el número de tu parada?</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        📍 ¿No sabés el número de tu parada?
+      </h2>
       <p className="text-center mb-4 text-sm text-gray-600">
         Buscá por nombre de calle y encontrá tu número de parada.
       </p>
@@ -157,7 +170,9 @@ const BuscarParada = () => {
                       onClick={() => toggleFavorita(p.busstopId)}
                       className="text-sm text-blue-600 hover:underline"
                     >
-                      {favoritas.includes(p.busstopId) ? "★ Favorita" : "☆ Agregar a favoritos"}
+                      {favoritas.includes(p.busstopId)
+                        ? "★ Favorita"
+                        : "☆ Agregar a favoritos"}
                     </button>
                     <button
                       onClick={() => toggleExpand(p.busstopId)}

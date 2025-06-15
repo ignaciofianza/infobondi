@@ -13,9 +13,7 @@ const Footer = () => {
       <p className="mb-2">
         © {new Date().getFullYear()} InfoBondi. Derechos reservados.
       </p>
-      <p className="mb-2">
-        Datos proporcionados por la I.M.M.
-      </p>
+      <p className="mb-2">Datos proporcionados por la I.M.M.</p>
       <p className="text-xs text-black">
         Hecho con ❤️ por{" "}
         <a

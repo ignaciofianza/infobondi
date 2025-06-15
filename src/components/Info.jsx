@@ -21,8 +21,8 @@ const Info = () => {
         transition={{ delay: 0.2, duration: 0.5 }}
         viewport={{ once: true }}
       >
-        InfoBondi es una plataforma rápida e intuitiva para consultar horarios de
-        ómnibus, ubicar paradas y acceder a datos útiles como accesibilidad,
+        InfoBondi es una plataforma rápida e intuitiva para consultar horarios
+        de ómnibus, ubicar paradas y acceder a datos útiles como accesibilidad,
         emisiones y más. Todo en tiempo real, todo en un mismo lugar.
       </motion.p>
 
