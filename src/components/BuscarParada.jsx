@@ -33,7 +33,7 @@ const BuscarParada = () => {
       setLoading(true);
       try {
         const cache = localStorage.getItem("paradasCache");
-        const data = cache ? JSON.parse(cache) : await (await fetch("http://infobondiapi.ignaciofianza.com/api/paradas")).json();
+        const data = cache ? JSON.parse(cache) : await (await fetch("https://infobondiapi.ignaciofianza.com/api/paradas")).json();
         if (!cache) localStorage.setItem("paradasCache", JSON.stringify(data));
         setParadas(data);
       } catch (err) {
