@@ -10,13 +10,13 @@ const Hero = () => {
 
   return (
     <motion.section
-      className="flex flex-col items-center justify-center min-h-[60vh] bg-white text-black px-2 text-center"
+      className="flex flex-col items-center justify-center min-h-[40vh] pt-24 px-4 text-center"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <motion.h1
-        className="text-5xl font-extrabold mb-4 max-w-xl"
+        className="text-4xl sm:text-5xl font-extrabold mb-4 max-w-xl"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.6 }}
@@ -25,7 +25,7 @@ const Hero = () => {
       </motion.h1>
 
       <motion.p
-        className="text-lg text-gray-600 mb-8 max-w-lg"
+        className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-8 max-w-lg"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4, duration: 0.6 }}
@@ -34,7 +34,7 @@ const Hero = () => {
       </motion.p>
 
       <motion.button
-        className="bg-black text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-800 transition cursor-pointer"
+        className="bg-black text-white px-6 py-2.5 rounded-xl font-medium hover:bg-gray-800 transition cursor-pointer"
         onClick={scrollToBuscarBondi}
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.02 }}

@@ -18,8 +18,11 @@ const BuscarBondi = () => {
     setResultado(null);
 
     try {
-      const res = await fetch(`http://192.168.1.18:3001/api/parada/${parada}`);
-      if (!res.ok) throw new Error("No se pudo obtener la información de la parada");
+      const res = await fetch(
+        `https://infobondiapi.ignaciofianza.com/api/parada/${parada}`
+      );
+      if (!res.ok)
+        throw new Error("No se pudo obtener la información de la parada");
 
       const data = await res.json();
       setResultado(data);
@@ -38,26 +41,37 @@ const BuscarBondi = () => {
   );
 
   return (
-    <div className="max-w-md mx-auto px-6 py-8 rounded-2xl shadow-xl backdrop-blur-md border shadow-lg">
-      <h2 className="text-2xl font-semibold text-center mb-6">⏱ Próximos ómnibus</h2>
+    <section id="buscar-bondi" className="mt-12 px-4 max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4 text-center">
+        ⏱ Próximos ómnibus
+      </h2>
+      <p className="text-center mb-4 text-sm text-gray-600">
+        Consultá cuándo llega el próximo bondi a tu parada.
+      </p>
 
-      <input
-        type="number"
-        placeholder="Número de parada (ej: 1615)"
-        value={parada}
-        onChange={(e) => setParada(e.target.value)}
-        className="w-full text-center text-lg px-4 py-2 rounded-xl border mb-4 focus:outline-none focus:ring transition"
-      />
+      <div className="flex gap-2 mb-4">
+        <input
+          type="number"
+          placeholder="Número de parada (ej: 1615)"
+          value={parada}
+          onChange={(e) => setParada(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") buscar();
+          }}
+          className="flex-1 px-4 py-2 text-center border rounded-xl focus:outline-none focus:ring"
+        />
+        <button
+          onClick={buscar}
+          disabled={loading}
+          className="px-4 py-2 bg-black text-white rounded-xl hover:opacity-90 active:scale-95 transition"
+        >
+          {loading ? "Buscando..." : "Consultar"}
+        </button>
+      </div>
 
-      <button
-        onClick={buscar}
-        disabled={loading}
-        className="w-full py-2.5 rounded-xl text-white bg-black hover:opacity-90 active:scale-[0.95] transition"
-      >
-        {loading ? "Buscando..." : "Consultar parada"}
-      </button>
-
-      {error && <p className="mt-4 text-red-500 text-center text-sm">⚠️ {error}</p>}
+      {error && (
+        <p className="text-center text-red-500 text-sm mb-4">⚠️ {error}</p>
+      )}
 
       <AnimatePresence>
         {resultado && (
@@ -67,7 +81,7 @@ const BuscarBondi = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="mt-6 text-center text-sm"
+                className="mt-6 text-center text-sm text-gray-600"
               >
                 😕 No hay bondis en camino por ahora.
               </motion.p>
@@ -85,13 +99,16 @@ const BuscarBondi = () => {
                   transition: { staggerChildren: 0.1 },
                 },
               }}
-              className="mt-1 space-y-3"
+              className="space-y-3"
             >
               {resultado.map((item, index) => (
                 <motion.div
                   key={index}
-                  variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
-                  className="p-4 rounded-xl border shadow-sm "
+                  variants={{
+                    hidden: { opacity: 0, y: 10 },
+                    visible: { opacity: 1, y: 0 },
+                  }}
+                  className="p-4 border rounded-xl shadow-sm"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2 font-medium text-base">
@@ -110,13 +127,19 @@ const BuscarBondi = () => {
 
                     {item.eta && (
                       <div>
-                        ⏳ Llega en <strong>{Math.round(item.eta / 60)} min</strong> ({item.eta} seg)
+                        ⏳ Llega en{" "}
+                        <strong>{Math.round(item.eta / 60)} min</strong> (
+                        {item.eta} seg)
                       </div>
                     )}
-                    {item.access && item.access !== "Sin datos" && tag(<span>👨‍🦽‍➡️</span>, item.access)}
-                    {item.thermalConfort && item.thermalConfort !== "Sin datos" &&
+                    {item.access &&
+                      item.access.toLowerCase() !== "sin datos" &&
+                      tag(<span>👨‍🦽‍➡️</span>, item.access)}
+                    {item.thermalConfort &&
+                      item.thermalConfort.toLowerCase() !== "sin datos" &&
                       tag(<span>❄️</span>, item.thermalConfort)}
-                    {item.emissions && item.emissions !== "Sin datos" &&
+                    {item.emissions &&
+                      item.emissions.toLowerCase() !== "sin datos" &&
                       tag(<span>🍃</span>, item.emissions)}
                   </div>
                 </motion.div>
@@ -125,7 +148,7 @@ const BuscarBondi = () => {
           </>
         )}
       </AnimatePresence>
-    </div>
+    </section>
   );
 };
 
