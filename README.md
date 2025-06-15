@@ -1,12 +1,29 @@
-# React + Vite
+# InfoBondi
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**InfoBondi** es una plataforma web ligera, rápida y diseñada con enfoque minimalista para consultar información útil sobre el transporte público en Montevideo.
 
-Currently, two official plugins are available:
+## 🧠 ¿Qué hace?
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Muestra **próximos ómnibus** en tiempo real a partir del número de parada.
+- Permite buscar el número de una parada a partir de **nombres de calles**.
+- Accede a **información adicional** como accesibilidad, emisiones y confort térmico.
+- Guarda tus **paradas favoritas** para acceso más rápido.
+- Visualiza las paradas en un **mapa interactivo**.
 
-## Expanding the ESLint configuration
+## ✨ Características
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Interfaz moderna, accesible y responsiva.
+- Animaciones suaves con **Framer Motion**.
+- Integración de mapas con **Leaflet + OpenStreetMap**.
+- Optimización de rendimiento y uso eficiente de recursos.
+- Experiencia adaptada para **mobile** y escritorio.
+- Scroll suave entre secciones.
+- Cacheo inteligente en localStorage para uso fluido.
+
+## 👤 Autor
+
+Creado por [_**Ignacio Fianza**_](https://ignaciofianza.com), desarrollado de forma independiente como proyecto personal.
+
+---
+
+> ⚠️ Este proyecto es de código abierto, pero el backend no está incluido ya que está diseñado para uso personal y no está pensado para ser replicado o consumido públicamente.
