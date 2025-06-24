@@ -37,7 +37,7 @@ const BuscarParada = () => {
         const data = cache
           ? JSON.parse(cache)
           : await (
-              await fetch("https://infobondiapi.ignaciofianza.com/api/paradas")
+              await fetch("https://infobondi-back.fly.dev/api/paradas")
             ).json();
         if (!cache) localStorage.setItem("paradasCache", JSON.stringify(data));
         setParadas(data);

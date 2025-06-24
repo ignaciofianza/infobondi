@@ -31,7 +31,7 @@ const BuscarBondi = () => {
 
     try {
       const res = await fetch(
-        `https://infobondiapi.ignaciofianza.com/api/parada/${parada}`
+        `https://infobondi-back.fly.dev/api/parada/${parada}`
       );
       if (!res.ok)
         throw new Error("No se pudo obtener la información de la parada");
