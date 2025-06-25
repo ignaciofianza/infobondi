@@ -13,7 +13,7 @@ const App = () => {
   const refContacto = useRef(null);
 
   return (
-    <>
+    <> 
       <Navbar
         onScrollTo={{
           horarios: () =>
