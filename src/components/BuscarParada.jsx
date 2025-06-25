@@ -3,7 +3,9 @@ import {
   useState,
   useMemo,
   useRef,
+  useCallback,
 } from "react";
+import LoadingSpinner from "./LoadingSpinner";
 import {
   MapContainer,
   TileLayer,
@@ -42,6 +44,33 @@ const BuscarParada = () => {
   const [ubicacion, setUbicacion] = useState(null);
   const [paradaEnfocada, setParadaEnfocada] = useState(null);
   const timeoutRef = useRef(null);
+  const paradasNormalizadas = useRef(new Map());
+
+  // Preprocesar paradas al cargar
+  useEffect(() => {
+    const procesarParadas = () => {
+      const map = new Map();
+      paradas.forEach((p, index) => {
+        const calle1 = normalizar(p.street1 || "");
+        const calle2 = normalizar(p.street2 || "");
+        const combinaciones = [
+          `${calle1} y ${calle2}`,
+          `${calle2} y ${calle1}`,
+          calle1,
+          calle2,
+        ];
+        combinaciones.forEach(combo => {
+          if (combo) {
+            const set = map.get(combo) || new Set();
+            set.add(index);
+            map.set(combo, set);
+          }
+        });
+      });
+      paradasNormalizadas.current = map;
+    };
+    procesarParadas();
+  }, [paradas]);
 
   useEffect(() => {
     setFavoritas(JSON.parse(localStorage.getItem("paradasFavoritas")) || []);
@@ -51,6 +80,10 @@ const BuscarParada = () => {
     const cargarParadas = async () => {
       try {
         const cache = localStorage.getItem("paradasCache");
+        // const data = cache
+        //   ? JSON.parse(cache)
+        //   : await (await fetch("https://infobondi-back.fly.dev/api/paradas")).json();
+        // if (!cache) localStorage.setItem("paradasCache", JSON.stringify(data));
         const data = cache
           ? JSON.parse(cache)
           : await (await fetch("https://infobondi-back.fly.dev/api/paradas")).json();
@@ -70,33 +103,35 @@ const BuscarParada = () => {
     );
   }, []);
 
+  const buscarParadas = useCallback((query) => {
+    const normalizedQuery = normalizar(query);
+    if (normalizedQuery.length < 3) return [];
+
+    // Buscar en el mapa preprocesado
+    const matches = new Set();
+    paradasNormalizadas.current.forEach((indices, key) => {
+      if (key.includes(normalizedQuery)) {
+        indices.forEach(idx => matches.add(idx));
+      }
+    });
+
+    // Convertir índices a paradas y limitar a 10 resultados
+    const resultados = Array.from(matches)
+      .map(idx => paradas[idx])
+      .slice(0, 10);
+    
+    return resultados;
+  }, [paradas]);
+
   useEffect(() => {
     clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => {
-      const b = normalizar(input);
-      if (b.length < 3) return setResultado([]);
-
-      const res = [];
-      for (let i = 0; i < paradas.length; i++) {
-        const p = paradas[i];
-        const calle1 = normalizar(p.street1 || "");
-        const calle2 = normalizar(p.street2 || "");
-        const combinaciones = [
-          `${calle1} y ${calle2}`,
-          `${calle2} y ${calle1}`,
-          calle1,
-          calle2,
-        ];
-        if (combinaciones.some((combo) => combo.includes(b))) {
-          res.push(p);
-          if (res.length >= 10) break; // máximo 10 resultados para performance
-        }
-      }
-      setResultado(res);
+      const resultados = buscarParadas(input);
+      setResultado(resultados);
     }, 400);
 
     return () => clearTimeout(timeoutRef.current);
-  }, [input, paradas]);
+  }, [input, buscarParadas]);
 
   const toggleFavorita = (id) => {
     const nuevas = favoritas.includes(id)
@@ -106,10 +141,15 @@ const BuscarParada = () => {
     localStorage.setItem("paradasFavoritas", JSON.stringify(nuevas));
   };
 
+  // Coordenadas predeterminadas para Mapa
+  const coordenadasPredeterminadas = [-34.9057325, -56.1913804];
+
   const CenterOnLocation = () => {
     const map = useMap();
     useEffect(() => {
-      if (ubicacion) map.setView(ubicacion, 15);
+      // Si hay ubicación, usarla, sino usar las coordenadas predeterminadas
+      const center = ubicacion || coordenadasPredeterminadas;
+      map.setView(center, 15);
     }, [ubicacion]);
     return null;
   };
@@ -123,25 +163,32 @@ const BuscarParada = () => {
   };
 
   return (
-    <section className="mt-12 px-4 max-w-5xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-center">
+    <section className="mt-8 px-4 max-w-4xl mx-auto">
+      <h2 className="text-xl font-bold mb-3 text-center">
         📍 ¿No sabés el número de tu parada?
       </h2>
-      <p className="text-center mb-4 text-sm text-gray-600">
+      <p className="text-center mb-3 text-xs text-gray-600">
         Buscá por nombre de calle o mirá el mapa completo.
       </p>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-3">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ej: Millán y Herrera"
-          className="flex-1 px-4 py-2 border rounded-xl focus:outline-none focus:ring"
+          aria-label="Buscar parada por nombre de calle"
+          role="search"
+          className="flex-1 px-3 py-1.5 border rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
         />
         <button
-          onClick={() => setParadaEnfocada(null)}
-          className="px-4 py-2 bg-black text-white rounded-xl hover:opacity-90 transition"
+          onClick={() => {
+            setParadaEnfocada(null);
+            setInput("");
+            setResultado([]);
+          }}
+          aria-label="Limpiar búsqueda"
+          className="px-3 py-1.5 bg-black text-white rounded-lg hover:opacity-90 transition"
         >
           Resetear
         </button>
@@ -255,12 +302,26 @@ const BuscarParada = () => {
                       {p.street1} y {p.street2}
                     </p>
                   </div>
-                  <button
-                    onClick={() => toggleFavorita(p.busstopId)}
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    Quitar
-                  </button>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => toggleFavorita(p.busstopId)}
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      Quitar
+                    </button>
+                    <button
+                      onClick={() => {
+                        const coords = p.location?.coordinates;
+                        if (coords?.length === 2) {
+                          const [lng, lat] = coords;
+                          setParadaEnfocada([lat, lng]);
+                        }
+                      }}
+                      className="text-sm text-green-600 hover:underline"
+                    >
+                      Ver en mapa
+                    </button>
+                  </div>
                 </li>
               ))}
           </ul>

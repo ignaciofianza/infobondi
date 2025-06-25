@@ -1,8 +1,9 @@
 // src/components/BuscarBondi.jsx
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
+import LoadingSpinner from "./LoadingSpinner";
 
 // Fix del icono de Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -18,6 +19,7 @@ const BuscarBondi = () => {
   const [resultado, setResultado] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef(null);
 
   const buscar = async () => {
     if (!parada) {
@@ -31,6 +33,7 @@ const BuscarBondi = () => {
 
     try {
       const res = await fetch(
+        // `https://infobondi-back.fly.dev/api/parada/${parada}`
         `https://infobondi-back.fly.dev/api/parada/${parada}`
       );
       if (!res.ok)
@@ -74,34 +77,46 @@ const BuscarBondi = () => {
   };
 
   return (
-    <section id="buscar-bondi" className="mt-12 px-4 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-center">
-        ⏱ Próximos ómnibus
+    <section id="buscar-bondi" className="mt-8 px-4 max-w-4xl mx-auto">
+      <h2 className="text-xl font-bold mb-3 text-center">
+        ⌛ Próximos ómnibus
       </h2>
-      <p className="text-center mb-4 text-sm text-gray-600">
+      <p className="text-center mb-3 text-xs text-gray-600">
         Consultá cuándo llega el próximo bondi a tu parada.
       </p>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-2 mb-3">
         <input
           type="number"
           placeholder="Número de parada (ej: 1615)"
           value={parada}
           onChange={(e) => setParada(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && buscar()}
-          className="flex-1 px-4 py-2 text-center border rounded-xl focus:outline-none focus:ring"
+          ref={inputRef}
+          aria-label="Número de parada a buscar"
+          role="search"
+          className="flex-1 px-3 py-1.5 border rounded-lg focus:outline-none focus:ring focus:ring-blue-500"
         />
         <button
           onClick={buscar}
           disabled={loading}
-          className="px-4 py-2 bg-black text-white rounded-xl hover:opacity-90 active:scale-95 transition"
+          className="px-3 py-1.5 bg-black text-white rounded-lg hover:opacity-90 transition"
+          aria-label="Buscar bondis"
         >
-          {loading ? "Buscando..." : "Consultar"}
+          {loading ? <LoadingSpinner size={20} /> : "Consultar"}
         </button>
       </div>
 
       {error && (
-        <p className="text-center text-red-500 text-sm mb-4">⚠️ {error}</p>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="text-center text-red-500 text-sm mb-4"
+          role="alert"
+        >
+          ⚠️ {error}
+        </motion.p>
       )}
 
       <AnimatePresence>
